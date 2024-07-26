@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: Coffee Shop API
+  description: This API allows customers to browse and order coffee from our shop.
+  version: 1.0.0
+servers:
+- url: https://api.coffeeshop.com/v1
+  description: Production server
+- url: https://staging.api.coffeeshop.com/v1
+  description: Staging server
+paths:
+  /coffees:
+    get:
+      summary: Get a list of all available coffees
+      description: Returns a list of all coffees available in the shop.
+      operationId: coffees_get
+      responses:
+        "200":
+          description: A list of coffees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Coffee'
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /coffees/{id}:
+    get:
+      summary: Get details of a specific coffee
+      description: Returns details of a coffee given its ID.
+      operationId: coffees_id_get
+      parameters:
+      - name: id
+        in: path
+        description: ID of the coffee
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Coffee details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coffee'
+        "404":
+          description: Coffee not found
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /orders:
+    post:
+      summary: Place a new order
+      description: Creates a new coffee order.
+      operationId: orders_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /orders/{id}:
+    get:
+      summary: Get details of a specific order
+      description: Returns details of an order given its ID.
+      operationId: orders_id_get
+      parameters:
+      - name: id
+        in: path
+        description: ID of the order
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        "404":
+          description: Order not found
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas:
+    Coffee:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Espresso
+        price:
+          type: number
+          format: float
+          example: 2.99
+        description:
+          type: string
+          example: "A strong, full-bodied coffee."
+      example:
+        price: 2.99
+        name: Espresso
+        description: "A strong, full-bodied coffee."
+        id: 1
+    Order:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          example: 123
+        coffeeId:
+          type: integer
+          example: 1
+        quantity:
+          type: integer
+          example: 2
+        totalPrice:
+          type: number
+          format: float
+          example: 5.98
+    OrderResponse:
+      type: object
+      properties:
+        orderId:
+          type: integer
+          example: 456
+        customerId:
+          type: integer
+          example: 123
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        totalPrice:
+          type: number
+          format: float
+          example: 5.98
+      example:
+        orderId: 456
+        totalPrice: 5.98
+        customerId: 123
+        items:
+        - quantity: 2
+          coffeeId: 1
+          price: 2.99
+        - quantity: 2
+          coffeeId: 1
+          price: 2.99
+    OrderItem:
+      type: object
+      properties:
+        coffeeId:
+          type: integer
+          example: 1
+        quantity:
+          type: integer
+          example: 2
+        price:
+          type: number
+          format: float
+          example: 2.99
+      example:
+        quantity: 2
+        coffeeId: 1
+        price: 2.99
+
